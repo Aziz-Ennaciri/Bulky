@@ -23,18 +23,29 @@
                 <th>
                     Display Order
                 </th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var obj in Model)
             {
                  <tr>
-                    <th>
+                    <td>
                         @obj.Name
-                    </th>
-                    <th>
+                    </td>
+                    <td>
                         @obj.DisplayOrder
-                    </th>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-start">
+                            <a asp-controller="Category" asp-action="Edit" class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a asp-controller="Category" asp-action="Delete" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </div>
+                    </td>
                 </tr>
             }
         </tbody>
