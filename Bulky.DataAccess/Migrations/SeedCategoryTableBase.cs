@@ -2,17 +2,12 @@
 using BulkyDataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-#nullable disable
-
-namespace BulkyDataAccess.Migrations
+namespace BulkyWeb.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241116185943_AddCategoryTableToDb")]
-    partial class AddCategoryTableToDb
+    [DbContext(typeof(ApplicationDbContext)), Migration("20241116194904_SeedCategoryTable")]
+    internal class SeedCategoryTableBase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,9 +27,8 @@ namespace BulkyDataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<string>("DisplayOrder")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -43,6 +37,26 @@ namespace BulkyDataAccess.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1,
+                            DisplayOrder = 1,
+                            Name = "Action"
+                        },
+                        new
+                        {
+                            id = 2,
+                            DisplayOrder = 2,
+                            Name = "shi"
+                        },
+                        new
+                        {
+                            id = 3,
+                            DisplayOrder = 3,
+                            Name = "faa"
+                        });
                 });
 #pragma warning restore 612, 618
         }
