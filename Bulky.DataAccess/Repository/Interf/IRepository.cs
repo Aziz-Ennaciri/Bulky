@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BulkyDataAccess.Repository.Interf
 {
-    internal interface IRepository<T> where T : class
+    public interface IRepository<T> where T : class
     {
         IEnumerable<T> GetAll();
         T GetFirstIdOrDefaul(Expression<Func<T,bool>>filter);
