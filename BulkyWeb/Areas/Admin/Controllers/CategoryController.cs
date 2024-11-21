@@ -1,6 +1,6 @@
 ﻿using BulkyDataAccess.Data;
 using BulkyDataAccess.Repository.Interf;
-using BulkyModels.Category;
+using BulkyModels.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BulkyWeb.Areas.Admin.Controllers

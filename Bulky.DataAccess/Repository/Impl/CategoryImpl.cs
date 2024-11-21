@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BulkyDataAccess.Data;
 using BulkyDataAccess.Repository.Interf;
-using BulkyModels.Category;
+using BulkyModels.Models;
 
 namespace BulkyDataAccess.Repository.Impl
 {
