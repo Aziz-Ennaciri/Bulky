@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BulkyDataAccess.Repository.Interf;
 using BulkyModels.Models;
+using BulkyModels.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -36,28 +37,54 @@ namespace BulkyWeb.Areas.Admin.Controllers
         // GET: ProductController/Create
         public IActionResult Create()
         {
-            IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+            //IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+            //{
+            //    Text = u.Name,
+            //    Value = u.id.ToString()
+            //});
+            //ViewBag.Category = categoryList;
+            //return View();
+
+
+            ProductVM productVM = new()
             {
-                Text = u.Name,
-                Value = u.id.ToString()
-            });
-            ViewBag.Category = categoryList;
-            return View();
+                categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.id.ToString()
+                }),
+                product = new Product()
+            };
+            return View(productVM);
+
+
+
+
         }
 
         // POST: ProductController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Product product)
+        public IActionResult Create(ProductVM productVM)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
-                _unitOfWork.ProductRepo.Add(product);
+                _unitOfWork.ProductRepo.Add(productVM.product);
                 _unitOfWork.Save();
                 TempData["success"] = "Category created successfully";
                 return RedirectToAction("Index");
             }
-            return View();
+            else
+            {
+                productVM.categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.id.ToString()
+                });
+                    return View(productVM);
+            }
+                
+            
         }
 
         // GET: ProductController/Edit/5
