@@ -33,19 +33,38 @@ namespace BulkyWeb.Areas.Admin.Controllers
         {
             return View();
         }
+        
+        //
 
         // GET: ProductController/Create
-        public IActionResult Create()
+        //public IActionResult Create()
+        //{
+        //    //IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+        //    //{
+        //    //    Text = u.Name,
+        //    //    Value = u.id.ToString()
+        //    //});
+        //    //ViewBag.Category = categoryList;
+        //    //return View();
+
+
+        //    ProductVM productVM = new()
+        //    {
+        //        categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+        //        {
+        //            Text = u.Name,
+        //            Value = u.id.ToString()
+        //        }),
+        //        product = new Product()
+        //    };
+        //    return View(productVM);
+
+
+
+
+        //}
+        public IActionResult Upsert(int? id)
         {
-            //IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
-            //{
-            //    Text = u.Name,
-            //    Value = u.id.ToString()
-            //});
-            //ViewBag.Category = categoryList;
-            //return View();
-
-
             ProductVM productVM = new()
             {
                 categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
@@ -55,7 +74,18 @@ namespace BulkyWeb.Areas.Admin.Controllers
                 }),
                 product = new Product()
             };
-            return View(productVM);
+            if(id == null || id == 0) 
+            {
+                //create
+                return View(productVM);
+            }
+            else 
+            {
+                //update
+                productVM.product = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u => u.Id == id);
+                return View(productVM);
+            }
+            
 
 
 
@@ -63,9 +93,30 @@ namespace BulkyWeb.Areas.Admin.Controllers
         }
 
         // POST: ProductController/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Create(ProductVM productVM)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _unitOfWork.ProductRepo.Add(productVM.product);
+        //        _unitOfWork.Save();
+        //        TempData["success"] = "Category created successfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    else
+        //    {
+        //        productVM.categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
+        //        {
+        //            Text = u.Name,
+        //            Value = u.id.ToString()
+        //        });
+        //            return View(productVM);
+        //    }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ProductVM productVM)
+        public IActionResult Upsert(ProductVM productVM,IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -81,41 +132,44 @@ namespace BulkyWeb.Areas.Admin.Controllers
                     Text = u.Name,
                     Value = u.id.ToString()
                 });
-                    return View(productVM);
+                return View(productVM);
             }
-                
-            
+
+
         }
 
-        // GET: ProductController/Edit/5
-        public IActionResult Edit(int? id)
-        {
-            if (id == null || id==0) 
-            {
-                return NotFound();
-            }
-            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u=>u.Id == id);
-            if (objProduct == null) 
-            {
-                return NotFound();
-            }
-            return View(objProduct);
-        }
 
-        // POST: ProductController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Product obj)
-        {
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.ProductRepo.Update(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Category updated successfully";
-                return RedirectToAction("Index");
-            }
-            return View();
-        }
+        
+
+        //// GET: ProductController/Edit/5
+        //public IActionResult Edit(int? id)
+        //{
+        //    if (id == null || id==0) 
+        //    {
+        //        return NotFound();
+        //    }
+        //    Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u=>u.Id == id);
+        //    if (objProduct == null) 
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(objProduct);
+        //}
+
+        //// POST: ProductController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Edit(Product obj)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _unitOfWork.ProductRepo.Update(obj);
+        //        _unitOfWork.Save();
+        //        TempData["success"] = "Category updated successfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View();
+        //}
 
         // GET: ProductController/Delete/5
         public ActionResult Delete(int? id)
