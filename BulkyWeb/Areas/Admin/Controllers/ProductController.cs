@@ -128,6 +128,16 @@ namespace BulkyWeb.Areas.Admin.Controllers
                     string fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
                     string productPath  = Path.Combine(wwwRootPath, @"images\product");
 
+                    if(!string.IsNullOrEmpty(productVM.product.imageUrl))
+                    {
+                        //delete the old img from th DB
+                        var oldImage = Path.Combine(wwwRootPath, productVM.product.imageUrl.Trim('\\'));
+                        if(System.IO.File.Exists(oldImage))
+                        {
+                            System.IO.File.Delete(oldImage);
+                        }
+                    }
+
                     using (var fileStream = new FileStream(Path.Combine(productPath, fileName),FileMode.Create))
                     {
                         file.CopyTo(fileStream);
@@ -135,8 +145,17 @@ namespace BulkyWeb.Areas.Admin.Controllers
                     productVM.product.imageUrl = @"\images\product\" + fileName;
                 }
 
+                if(productVM.product.Id == 0)
+                {
+                    _unitOfWork.ProductRepo.Add(productVM.product);
+                }
+                else
+                {
+                    _unitOfWork.ProductRepo.Update(productVM.product);
+                }
 
-                _unitOfWork.ProductRepo.Add(productVM.product);
+
+                
                 _unitOfWork.Save();
                 TempData["success"] = "Category created successfully";
                 return RedirectToAction("Index");
