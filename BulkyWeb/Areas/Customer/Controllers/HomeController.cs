@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using BulkyModels.ErrorViewModel;
+using BulkyModels.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BulkyWeb.Areas.Customer.Controllers
