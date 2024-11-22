@@ -58,6 +58,11 @@
                     </select>
                     <span asp-validation-for="product.categoryId" class="text-danger"></span>
                 </div>
+                <div class="mb-3 row p-1">
+                    <label asp-for="product.imageUrl" class="ms-2"></label>
+                    <input type="file" asp-for="product.imageUrl" class="form-control border-0 shadow" />
+                    <span  class="text-danger"></span>
+                </div>
                 <div class="row">
                     <div class="col-6 col-md-3">
                         <button type="submit" class="btn btn-primary form-control">Create</button>
