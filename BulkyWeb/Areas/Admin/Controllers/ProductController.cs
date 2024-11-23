@@ -13,7 +13,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductController(IUnitOfWork unitOfWork , IWebHostEnvironment webHostEnvironment)
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
@@ -21,8 +21,8 @@ namespace BulkyWeb.Areas.Admin.Controllers
         // GET: ProductController
         public IActionResult Index()
         {
-            List<Product> objProductList = _unitOfWork.ProductRepo.GetAll(includeProperties:"Category").ToList();
-            
+            List<Product> objProductList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category").ToList();
+
             return View(objProductList);
         }
 
@@ -31,7 +31,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
         {
             return View();
         }
-        
+
         //
 
         // GET: ProductController/Create
@@ -72,18 +72,18 @@ namespace BulkyWeb.Areas.Admin.Controllers
                 }),
                 product = new Product()
             };
-            if(id == null || id == 0) 
+            if (id == null || id == 0)
             {
                 //create
                 return View(productVM);
             }
-            else 
+            else
             {
                 //update
                 productVM.product = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
                 return View(productVM);
             }
-            
+
 
 
 
@@ -226,19 +226,34 @@ namespace BulkyWeb.Areas.Admin.Controllers
         }
 
         // POST: ProductController/Delete/5
-        [HttpPost,ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeletePost(int? id)
+        public IActionResult DeletePost(int? id)
         {
-            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u=>u.Id == id);
-            if(id == null || id == 0) 
+            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
+            if (id == null || id == 0)
             {
-                return NotFound(); 
+                return NotFound();
             }
             _unitOfWork.ProductRepo.Remove(objProduct);
             _unitOfWork.Save();
             TempData["success"] = "Category deleted successfully";
             return RedirectToAction("Index");
         }
-    }
+    
+
+
+
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> objProductList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category").ToList();
+            return Json(new {data = objProductList });
+        }
+        #endregion
+
+
+
+    } 
 }
