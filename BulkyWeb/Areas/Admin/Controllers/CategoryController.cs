@@ -42,7 +42,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            Category? objCategory = _unitOfWork.CategoryRepo.GetFirstIdOrDefaul(u => u.id == id);
+            Category? objCategory = _unitOfWork.CategoryRepo.GetFirstIdOrDefault(u => u.id == id);
             if (objCategory == null)
             {
                 return NotFound();
@@ -69,7 +69,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            Category? objCategory = _unitOfWork.CategoryRepo.GetFirstIdOrDefaul(u => u.id == id);
+            Category? objCategory = _unitOfWork.CategoryRepo.GetFirstIdOrDefault(u => u.id == id);
             if (objCategory == null)
             {
                 return NotFound();
@@ -79,7 +79,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
-            Category? category = _unitOfWork.CategoryRepo.GetFirstIdOrDefaul(u => u.id == id);
+            Category? category = _unitOfWork.CategoryRepo.GetFirstIdOrDefault(u => u.id == id);
             if (category == null)
             {
                 return NotFound();

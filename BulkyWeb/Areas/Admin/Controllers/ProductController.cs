@@ -19,14 +19,10 @@ namespace BulkyWeb.Areas.Admin.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
         // GET: ProductController
-        public ActionResult Index()
+        public IActionResult Index()
         {
-            List<Product> objProductList = _unitOfWork.ProductRepo.GetAll().ToList();
-            IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
-            {
-                Text = u.Name,
-                Value = u.id.ToString()
-            });
+            List<Product> objProductList = _unitOfWork.ProductRepo.GetAll(includeProperties:"Category").ToList();
+            
             return View(objProductList);
         }
 
@@ -84,7 +80,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
             else 
             {
                 //update
-                productVM.product = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u => u.Id == id);
+                productVM.product = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
                 return View(productVM);
             }
             
@@ -118,34 +114,46 @@ namespace BulkyWeb.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(ProductVM productVM,IFormFile? file)
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                if (file == null)
-                {
-                    string fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
-                    string productPath  = Path.Combine(wwwRootPath, @"images\product");
 
-                    if(!string.IsNullOrEmpty(productVM.product.imageUrl))
+                if (file != null) // Ensure file is not null before attempting to use it
+                {
+                    // Generate a unique file name
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    // Create directory if it doesn't exist
+                    if (!Directory.Exists(productPath))
                     {
-                        //delete the old img from th DB
-                        var oldImage = Path.Combine(wwwRootPath, productVM.product.imageUrl.Trim('\\'));
-                        if(System.IO.File.Exists(oldImage))
+                        Directory.CreateDirectory(productPath);
+                    }
+
+                    // Delete the old image if updating and the imageUrl is not null or empty
+                    if (!string.IsNullOrEmpty(productVM.product.imageUrl))
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, productVM.product.imageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
                         {
-                            System.IO.File.Delete(oldImage);
+                            System.IO.File.Delete(oldImagePath);
                         }
                     }
 
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName),FileMode.Create))
+                    // Save the new file
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
+
+                    // Update the product's imageUrl property
                     productVM.product.imageUrl = @"\images\product\" + fileName;
                 }
 
-                if(productVM.product.Id == 0)
+                // Add or update the product in the database
+                if (productVM.product.Id == 0)
                 {
                     _unitOfWork.ProductRepo.Add(productVM.product);
                 }
@@ -154,27 +162,23 @@ namespace BulkyWeb.Areas.Admin.Controllers
                     _unitOfWork.ProductRepo.Update(productVM.product);
                 }
 
-
-                
                 _unitOfWork.Save();
-                TempData["success"] = "Category created successfully";
+                TempData["success"] = "Product saved successfully";
                 return RedirectToAction("Index");
             }
-            else
+
+            // If ModelState is invalid, reload the category list and return the view
+            productVM.categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
             {
-                productVM.categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.Name,
-                    Value = u.id.ToString()
-                });
-                return View(productVM);
-            }
-
-
+                Text = u.Name,
+                Value = u.id.ToString()
+            });
+            return View(productVM);
         }
 
 
-        
+
+
 
         //// GET: ProductController/Edit/5
         //public IActionResult Edit(int? id)
@@ -183,7 +187,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
         //    {
         //        return NotFound();
         //    }
-        //    Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u=>u.Id == id);
+        //    Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u=>u.Id == id);
         //    if (objProduct == null) 
         //    {
         //        return NotFound();
@@ -213,7 +217,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u => u.Id == id);
+            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
             if (objProduct == null)
             {
                 return NotFound();
@@ -226,7 +230,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeletePost(int? id)
         {
-            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefaul(u=>u.Id == id);
+            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u=>u.Id == id);
             if(id == null || id == 0) 
             {
                 return NotFound(); 
