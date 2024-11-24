@@ -63,6 +63,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
         //}
         public IActionResult Upsert(int? id)
         {
+            // Initialize the ProductVM object
             ProductVM productVM = new()
             {
                 categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
@@ -70,25 +71,25 @@ namespace BulkyWeb.Areas.Admin.Controllers
                     Text = u.Name,
                     Value = u.id.ToString()
                 }),
-                product = new Product()
+                product = new Product() // Create a new product instance by default
             };
-            if (id == null || id == 0)
+
+            // Check if it's an edit operation (id is provided and valid)
+            if (id != null && id > 0)
             {
-                //create
-                return View(productVM);
-            }
-            else
-            {
-                //update
+                // Fetch the product using the provided ID
                 productVM.product = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
-                return View(productVM);
+
+                // Handle the case where the product isn't found
+                if (productVM.product == null)
+                {
+                    return NotFound(); // Return a 404 response if the product doesn't exist
+                }
             }
 
-
-
-
-
+            return View(productVM); // Pass the view model to the view
         }
+
 
         // POST: ProductController/Create
         //[HttpPost]
@@ -119,36 +120,37 @@ namespace BulkyWeb.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
+                string productPath = Path.Combine(wwwRootPath, @"images\product");
 
-                if (file != null) // Ensure file is not null before attempting to use it
+                // Handle file upload and replace image if a new file is provided
+                if (file != null)
                 {
                     // Generate a unique file name
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
-                    // Create directory if it doesn't exist
+                    // Ensure directory exists
                     if (!Directory.Exists(productPath))
                     {
                         Directory.CreateDirectory(productPath);
                     }
 
-                    // Delete the old image if updating and the imageUrl is not null or empty
+                    // Remove old image if exists
                     if (!string.IsNullOrEmpty(productVM.product.imageUrl))
                     {
-                        var oldImagePath = Path.Combine(wwwRootPath, productVM.product.imageUrl.TrimStart('\\'));
+                        string oldImagePath = Path.Combine(wwwRootPath, productVM.product.imageUrl.TrimStart('\\'));
                         if (System.IO.File.Exists(oldImagePath))
                         {
                             System.IO.File.Delete(oldImagePath);
                         }
                     }
 
-                    // Save the new file
+                    // Save new image file
                     using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
 
-                    // Update the product's imageUrl property
+                    // Update the imageUrl in the product model
                     productVM.product.imageUrl = @"\images\product\" + fileName;
                 }
 
@@ -156,25 +158,33 @@ namespace BulkyWeb.Areas.Admin.Controllers
                 if (productVM.product.Id == 0)
                 {
                     _unitOfWork.ProductRepo.Add(productVM.product);
+                    TempData["success"] = "Product created successfully.";
                 }
                 else
                 {
                     _unitOfWork.ProductRepo.Update(productVM.product);
+                    TempData["success"] = "Product updated successfully.";
                 }
 
+                // Save changes to the database
                 _unitOfWork.Save();
-                TempData["success"] = "Product saved successfully";
+
+                // Redirect to the product list
                 return RedirectToAction("Index");
             }
 
-            // If ModelState is invalid, reload the category list and return the view
+            // Reload categories if validation fails
             productVM.categoryList = _unitOfWork.CategoryRepo.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.id.ToString()
             });
+
             return View(productVM);
         }
+
+
+
 
 
 
@@ -211,49 +221,69 @@ namespace BulkyWeb.Areas.Admin.Controllers
         //}
 
         // GET: ProductController/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
-            if (objProduct == null)
-            {
-                return NotFound();
-            }
-            return View(objProduct);
-        }
+        //public ActionResult Delete(int? id)
+        //{
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
+        //    if (objProduct == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(objProduct);
+        //}
 
-        // POST: ProductController/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
-        {
-            Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            _unitOfWork.ProductRepo.Remove(objProduct);
-            _unitOfWork.Save();
-            TempData["success"] = "Category deleted successfully";
-            return RedirectToAction("Index");
-        }
-    
+        //// POST: ProductController/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult DeletePost(int? id)
+        //{
+        //    Product objProduct = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    _unitOfWork.ProductRepo.Remove(objProduct);
+        //    _unitOfWork.Save();
+        //    TempData["success"] = "Category deleted successfully";
+        //    return RedirectToAction("Index");
+        //}
+
 
 
 
         #region API CALLS
         [HttpGet]
-        public IActionResult GetAll()
-        {
-            List<Product> objProductList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category").ToList();
-            return Json(new {data = objProductList });
+            public IActionResult GetAll()
+            {
+                List<Product> objProductList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category").ToList();
+                return Json(new { data = objProductList });
+            }
+
+            [HttpDelete]
+            public IActionResult Delete(int? id)
+            {
+                var productToBeDeleted = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == id);
+                if (productToBeDeleted == null)
+                {
+                    return Json(new { success = false, message = "Error while deleting" });
+                }
+                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.imageUrl.TrimStart('\\'));
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+
+                _unitOfWork.ProductRepo.Remove(productToBeDeleted);
+                _unitOfWork.Save();
+
+                return Json(new { success = true, message = "Delete Successful" });
+            }
+            #endregion
+
+
+
         }
-        #endregion
-
-
-
     } 
-}

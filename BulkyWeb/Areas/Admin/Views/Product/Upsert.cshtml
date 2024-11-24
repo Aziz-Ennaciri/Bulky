@@ -85,10 +85,17 @@
 						</div>
 					</div>
                 </div>
-                <div class="col-2">
-					<img src="@Model.product.imageUrl" width="100%" style="border-radius:5px;border:1px solid #bbb9b9" />
-                </div>
-            </div>
+				<div class="col-2">
+					@if (!string.IsNullOrEmpty(Model.product.imageUrl))
+					{
+						<img src="@Model.product.imageUrl" width="100%" style="border-radius:5px; border:1px solid #bbb9b9;" />
+					}
+					else
+					{
+						<img src="/images/placeholder.png" width="100%" style="border-radius:5px; border:1px solid #bbb9b9;" />
+					}
+				</div>
+
 
 
             

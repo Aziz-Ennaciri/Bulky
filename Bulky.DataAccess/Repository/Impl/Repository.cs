@@ -41,6 +41,11 @@ namespace BulkyDataAccess.Repository.Impl
         public T GetFirstIdOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+
+            // Apply the filter
+            query = query.Where(filter);
+
+            // Include additional properties if specified
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -48,8 +53,11 @@ namespace BulkyDataAccess.Repository.Impl
                     query = query.Include(includeProp);
                 }
             }
+
+            // Return the first or default match
             return query.FirstOrDefault();
         }
+
 
         public void Remove(T entity)
         {
