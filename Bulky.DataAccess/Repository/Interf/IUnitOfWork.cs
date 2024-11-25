@@ -10,6 +10,7 @@ namespace BulkyDataAccess.Repository.Interf
     {
         IProductRepository ProductRepo{ get; }
         ICategoryRepository CategoryRepo { get; }
+        ICompanyRepository CompanyRepo { get; }
         void Save();
     }
 }

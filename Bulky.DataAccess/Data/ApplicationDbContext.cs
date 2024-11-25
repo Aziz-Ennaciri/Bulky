@@ -15,6 +15,7 @@ namespace BulkyDataAccess.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> applicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -112,6 +113,70 @@ namespace BulkyDataAccess.Data
                     imageUrl = ""
                 }
             );
+
+            modelBuilder.Entity<Company>().HasData(
+            new Company
+                {
+                    Id = 1,
+                    Name = "Tech Corp",
+                    StreetAddress = "123 Tech Avenue",
+                    City = "San Francisco",
+                    State = "CA",
+                    PostalCode = "94103",
+                    PhoneNumber = "555-1234"
+                },
+            new Company
+                {
+                    Id = 2,
+                    Name = "Innovate LLC",
+                    StreetAddress = "456 Innovation Drive",
+                    City = "Austin",
+                    State = "TX",
+                    PostalCode = "73301",
+                    PhoneNumber = "555-5678"
+                },
+            new Company
+                {
+                    Id = 3,
+                    Name = "Bright Futures Inc.",
+                    StreetAddress = "789 Future Blvd",
+                    City = "Seattle",
+                    State = "WA",
+                    PostalCode = "98101",
+                    PhoneNumber = "555-7890"
+                },
+            new Company
+                {
+                    Id = 4,
+                    Name = "Pioneer Tech",
+                    StreetAddress = "101 Pioneer Way",
+                    City = "Denver",
+                    State = "CO",
+                    PostalCode = "80202",
+                    PhoneNumber = "555-1010"
+                },
+            new Company
+                {
+                    Id = 5,
+                    Name = "Eco Innovators",
+                    StreetAddress = "202 Green Lane",
+                    City = "Portland",
+                    State = "OR",
+                    PostalCode = "97209",
+                    PhoneNumber = "555-2020"
+                },
+            new Company
+                {
+                    Id = 6,
+                    Name = "NextGen Solutions",
+                    StreetAddress = "303 Progress Rd",
+                    City = "Chicago",
+                    State = "IL",
+                    PostalCode = "60601",
+                    PhoneNumber = "555-3030"
+                }
+        );
+
         }
     }
 }

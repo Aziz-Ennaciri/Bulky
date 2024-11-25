@@ -4,6 +4,7 @@ using BulkyDataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyDataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241125141833_addCompanyTable")]
+    partial class addCompanyTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,68 +96,6 @@ namespace BulkyDataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Companies");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            City = "San Francisco",
-                            Name = "Tech Corp",
-                            PhoneNumber = "555-1234",
-                            PostalCode = "94103",
-                            State = "CA",
-                            StreetAddress = "123 Tech Avenue"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            City = "Austin",
-                            Name = "Innovate LLC",
-                            PhoneNumber = "555-5678",
-                            PostalCode = "73301",
-                            State = "TX",
-                            StreetAddress = "456 Innovation Drive"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            City = "Seattle",
-                            Name = "Bright Futures Inc.",
-                            PhoneNumber = "555-7890",
-                            PostalCode = "98101",
-                            State = "WA",
-                            StreetAddress = "789 Future Blvd"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            City = "Denver",
-                            Name = "Pioneer Tech",
-                            PhoneNumber = "555-1010",
-                            PostalCode = "80202",
-                            State = "CO",
-                            StreetAddress = "101 Pioneer Way"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            City = "Portland",
-                            Name = "Eco Innovators",
-                            PhoneNumber = "555-2020",
-                            PostalCode = "97209",
-                            State = "OR",
-                            StreetAddress = "202 Green Lane"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            City = "Chicago",
-                            Name = "NextGen Solutions",
-                            PhoneNumber = "555-3030",
-                            PostalCode = "60601",
-                            State = "IL",
-                            StreetAddress = "303 Progress Rd"
-                        });
                 });
 
             modelBuilder.Entity("BulkyModels.Models.Product", b =>
