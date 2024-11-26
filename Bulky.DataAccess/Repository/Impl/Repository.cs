@@ -38,24 +38,45 @@ namespace BulkyDataAccess.Repository.Impl
             return query.ToList();
         }
 
-        public T GetFirstIdOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public T GetFirstIdOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> query = dbSet;
-
-            // Apply the filter
-            query = query.Where(filter);
-
-            // Include additional properties if specified
-            if (!string.IsNullOrEmpty(includeProperties))
+            if (tracked)
             {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(includeProp);
-                }
-            }
+                IQueryable<T> query = dbSet;
 
-            // Return the first or default match
-            return query.FirstOrDefault();
+                // Apply the filter
+                query = query.Where(filter);
+
+                // Include additional properties if specified
+                if (!string.IsNullOrEmpty(includeProperties)){
+                    foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        query = query.Include(includeProp);
+                    }
+                }
+
+                // Return the first or default match
+                return query.FirstOrDefault();
+            }
+            else
+            {
+                IQueryable<T> query = dbSet.AsNoTracking();
+
+                // Apply the filter
+                query = query.Where(filter);
+
+                // Include additional properties if specified
+                if (!string.IsNullOrEmpty(includeProperties))
+                {
+                    foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        query = query.Include(includeProp);
+                    }
+                }
+
+                // Return the first or default match
+                return query.FirstOrDefault();
+            }
         }
 
 
