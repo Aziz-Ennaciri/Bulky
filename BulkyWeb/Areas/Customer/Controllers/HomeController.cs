@@ -24,8 +24,13 @@ namespace BulkyWeb.Areas.Customer.Controllers
         }
         public IActionResult Details(int productId)
         {
-            Product product = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == productId, includeProperties: "Category");
-            return View(product);
+            ShoppingCart shoppingCart = new()
+            {
+                product = _unitOfWork.ProductRepo.GetFirstIdOrDefault(u => u.Id == productId, includeProperties: "Category"),
+                count = 1,
+                ProductId = productId
+            };
+            return View(shoppingCart);
         }
 
         public IActionResult Privacy()
