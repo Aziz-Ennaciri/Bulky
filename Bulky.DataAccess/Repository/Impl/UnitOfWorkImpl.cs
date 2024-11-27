@@ -16,6 +16,8 @@ namespace BulkyDataAccess.Repository.Impl
         public ICompanyRepository CompanyRepo { get; private set; } 
         public IShoppingCartRepository ShoppingCartRepo { get; private set; }
         public IApplicationUserRepository ApplicationUserRepo { get; private set; }
+        public IOrderHeaderRepository OrderHeaderRepo { get; private set; }
+        public IOrderDetailRepository OrderDetailRepo { get; private set; }
         public UnitOfWorkImpl(ApplicationDbContext db) 
         {
             _db = db;
@@ -24,6 +26,8 @@ namespace BulkyDataAccess.Repository.Impl
             CompanyRepo = new CompanyImpl(db);
             ShoppingCartRepo = new shoppingCartImpl(_db);
             ApplicationUserRepo = new ApplicationUserImpl(_db);
+            OrderHeaderRepo = new OrderHeaderImpl(_db);
+            OrderDetailRepo = new OrderDetailimpl(_db);
         }
 
         public void Save()
