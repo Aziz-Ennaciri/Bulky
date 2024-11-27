@@ -20,5 +20,18 @@ namespace BulkyDataAccess.Repository.Impl
         {
             _db.orderHeaders.Update(orderHeader);
         }
+
+        public void UpdateStatus(int id, string orderStatus, string? paymentStatus = null)
+        {
+            var orderFrmDb = _db.orderHeaders.FirstOrDefault(u => u.Id == id);
+            if (orderFrmDb != null)
+            {
+                orderFrmDb.OrderStatus = orderStatus;
+                if (!string.IsNullOrEmpty(paymentStatus))
+                {
+                    orderFrmDb.PaymentStatus = paymentStatus;
+                }
+            }
+        }
     }
 }
