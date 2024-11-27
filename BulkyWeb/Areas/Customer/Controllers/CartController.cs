@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using BulkyDataAccess.Repository.Interf;
+using BulkyModels;
 using BulkyModels.Models;
 using BulkyModels.ViewModels;
+using BulkyUtility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +14,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
         public CartController(IUnitOfWork unitOfWork)
         {
@@ -105,6 +108,70 @@ namespace BulkyWeb.Areas.Customer.Controllers
             }
             return View(ShoppingCartVM);
         }
+
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPost()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM.ShoppingCartList = _unitOfWork.ShoppingCartRepo.GetAll(u => u.ApplicationUserId == userId, includeProperties: "product");
+
+            ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
+            ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
+
+            ApplicationUser applicationUser = _unitOfWork.ApplicationUserRepo.GetFirstIdOrDefault(u => u.Id == userId);
+
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                cart.price = GetPriceBasedOnQuantity(cart);
+                ShoppingCartVM.OrderHeader.OrderTotal += (cart.price * cart.count);
+            }
+
+            if (applicationUser.CompanyId.GetValueOrDefault()==0)
+            {
+                //it is regular customer 
+                ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
+                ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusPending;
+            }
+            else
+            {
+                //it is a company user
+                ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusDelayedPayement;
+                ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusApproved;
+            }
+            _unitOfWork.OrderHeaderRepo.Add(ShoppingCartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach(var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
+                    Price = cart.price,
+                    Count = cart.count
+                };
+                _unitOfWork.OrderDetailRepo.Add(orderDetail);
+                _unitOfWork.Save();
+            }
+            if(applicationUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                //it is regular customer account and we need to capture payment
+                //strip logic
+            }
+
+            return RedirectToAction(nameof(OrderConfirmation), new {id=ShoppingCartVM.OrderHeader.Id});
+        }
+
+
+        public IActionResult OrderConfirmation (int id)
+        {
+            return View(id);
+        }
+
 
 
         private double GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
