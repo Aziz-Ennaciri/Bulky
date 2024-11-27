@@ -25,11 +25,12 @@ namespace BulkyWeb.Areas.Customer.Controllers
             ShoppingCartVM = new()
             {
                 ShoppingCartList = _unitOfWork.ShoppingCartRepo.GetAll(u => u.ApplicationUserId == userId, includeProperties: "product"),
+                OrderHeader = new()
             };
 
             foreach (var cart in ShoppingCartVM.ShoppingCartList) { 
                 cart.price = GetPriceBasedOnQuantity(cart);
-                ShoppingCartVM.OrderTotal += (cart.price * cart.count);
+                ShoppingCartVM.OrderHeader.OrderTotal += (cart.price * cart.count);
             }
 
             return View(ShoppingCartVM);
