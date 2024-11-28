@@ -34,28 +34,25 @@
         </div>
     </div> <div class="card-body p-4">
         <div class="d-flex justify-content-between pb-5 pt-2">
-            <span></span>
+            <span>@status</span>
             <ul class="list-group list-group-horizontal-sm">
                 <a style="text-decoration:none" asp-controller="Order" asp-action="Index" asp-route-status="inprocess">
-                    <li class="list-grou-item @inprocess">In Process</li>
+                <li class="list-group-item @inprocess">In Process</li>
                 </a>
-
                 <a style="text-decoration:none" asp-controller="Order" asp-action="Index" asp-route-status="pending">
-                <li class="list-grou-item @pending">Payment Pending</li>
+                <li class="list-group-item @pending">Payment Pending</li>
                 </a>
-
                 <a style="text-decoration:none" asp-controller="Order" asp-action="Index" asp-route-status="completed">
-                <li class="list-grou-item @completed">Completed</li>
+                <li class="list-group-item @completed">Completed</li>
                 </a>
-
                 <a style="text-decoration:none" asp-controller="Order" asp-action="Index" asp-route-status="approved">
-                <li class="list-grou-item @approved">Approved</li>
+                <li class="list-group-item @approved">Approved</li>
                 </a>
-
                 <a style="text-decoration:none" asp-controller="Order" asp-action="Index" asp-route-status="all">
-                <li class="list-grou-item @all">All</li>
+                <li class="list-group-item @all">All</li>
                 </a>
             </ul>
+
         </div>
 
         <table id="tblData" class="table table-bordered table-striped" style="width:100%">

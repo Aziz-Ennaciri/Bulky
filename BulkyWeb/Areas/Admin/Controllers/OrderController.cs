@@ -1,5 +1,6 @@
 ﻿using BulkyDataAccess.Repository.Interf;
 using BulkyModels.Models;
+using BulkyModels.ViewModels;
 using BulkyUtility;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -20,11 +21,22 @@ namespace BulkyWeb.Areas.Admin.Controllers
             return View();
         }
 
+        public IActionResult Details(int orderId)
+        {
+            OrderVM orderVM = new()
+            {
+                OrderHeader = _unitOfWork.OrderHeaderRepo.GetFirstIdOrDefault(u => u.Id == orderId, includeProperties: "ApplicationUser"),
+                OrderDetail = _unitOfWork.OrderDetailRepo.GetAll(u => u.OrderHeaderId == orderId, includeProperties: "Product")
+            };
+            return View(orderVM);
+        }
+
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll(string status)
         {
-            IEnumerable<OrderHeader> objOrderHeaders = _unitOfWork.OrderHeaderRepo.GetAll(includeProperties: "ApllicationUser").ToList();
+            IEnumerable<OrderHeader> objOrderHeaders = _unitOfWork.OrderHeaderRepo.GetAll(includeProperties: "ApplicationUser").ToList();
+
 
             switch (status)
             {
