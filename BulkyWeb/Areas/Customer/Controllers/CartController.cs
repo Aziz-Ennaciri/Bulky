@@ -54,7 +54,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Minus(int cartId)
         {
-            var cartFrmDb = _unitOfWork.ShoppingCartRepo.GetFirstIdOrDefault(u => u.Id == cartId);
+            var cartFrmDb = _unitOfWork.ShoppingCartRepo.GetFirstIdOrDefault(u => u.Id == cartId,tracked:true);
             if (cartFrmDb != null)
             {
                 if (cartFrmDb.count > 1)
@@ -64,6 +64,8 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 }
                 else
                 {
+                    HttpContext.Session.SetInt32(StaticDetails.SessionCart,
+                    _unitOfWork.ShoppingCartRepo.GetAll(u => u.ApplicationUserId == cartFrmDb.ApplicationUserId).Count() - 1);
                     _unitOfWork.ShoppingCartRepo.Remove(cartFrmDb);  
                 }
                 _unitOfWork.Save();
@@ -73,9 +75,12 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Remove(int cartId)
         {
-            var cartFrmDb = _unitOfWork.ShoppingCartRepo.GetFirstIdOrDefault(u => u.Id == cartId);
+            var cartFrmDb = _unitOfWork.ShoppingCartRepo.GetFirstIdOrDefault(u => u.Id == cartId,tracked:true);
             if (cartFrmDb != null)
             {
+                HttpContext.Session.SetInt32(StaticDetails.SessionCart, 
+                    _unitOfWork.ShoppingCartRepo.GetAll(u=>u.ApplicationUserId==cartFrmDb.ApplicationUserId).Count()-1);
+
                 _unitOfWork.ShoppingCartRepo.Remove(cartFrmDb);  // Remove the cart item completely
                 _unitOfWork.Save();
             }
@@ -169,6 +174,16 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation (int id)
         {
+            //OrderHeader orderHeader = _unitOfWork.OrderHeaderRepo.GetFirstIdOrDefault(u=>u.Id == id,includeProperties:"ApplicationUser");
+            //if (orderHeader.PaymentStatus != StaticDetails.PaymentStatusDelayedPayement) {
+            //    //this is an order by a Customer
+            //    var service = new SessionService();
+            //    Session session = service.Get(orderHeader);
+            //    if (session.PaymentStatus.ToLower() == "paid")
+            //    {
+            //        _unitOfWork.OrderHeaderRepo.updateS
+            //    }
+            //}
             return View(id);
         }
 

@@ -98,30 +98,30 @@ namespace BulkyWeb.Areas.Admin.Controllers
 
         [HttpPost]
         [Authorize(Roles = StaticDetails.Role_Admin + "," + StaticDetails.Role_Employee)]
-        public IActionResult CancelOrder()
-        {
-            var orderHeader = _unitOfWork.OrderHeaderRepo.GetFirstIdOrDefault(u => u.Id == OrderVM.OrderHeader.Id);
+        //public IActionResult CancelOrder()
+        //{
+        //    var orderHeader = _unitOfWork.OrderHeaderRepo.GetFirstIdOrDefault(u => u.Id == OrderVM.OrderHeader.Id);
 
-            if (orderHeader.PaymentStatus == StaticDetails.PaymentStatusApproved) {
-                var options = new RefundCreateOptions
-                {
-                    Reason = RefundReasons.RequestByCustomer,
-                    PaymentIntent = orderHeader.PaymentIntentId
-                };
-                var service = new RefundService();
-                Refund refund = service.Create(options);
+        //    if (orderHeader.PaymentStatus == StaticDetails.PaymentStatusApproved) {
+        //        var options = new RefundCreateOptions
+        //        {
+        //            Reason = RefundReasons.RequestByCustomer,
+        //            PaymentIntent = orderHeader.PaymentIntentId
+        //        };
+        //        var service = new RefundService();
+        //        Refund refund = service.Create(options);
 
-                _unitOfWork.OrderHeaderRepo.UpdateStatus(orderHeader.Id, StaticDetails.StatusCancelled,StaticDetails.StatusRefunded);
-            }
-            else
-            {
-                _unitOfWork.OrderHeaderRepo.UpdateStatus(orderHeader.Id, StaticDetails.StatusCancelled, StaticDetails.StatusCancelled);
-            }
-            _unitOfWork.Save();
+        //        _unitOfWork.OrderHeaderRepo.UpdateStatus(orderHeader.Id, StaticDetails.StatusCancelled,StaticDetails.StatusRefunded);
+        //    }
+        //    else
+        //    {
+        //        _unitOfWork.OrderHeaderRepo.UpdateStatus(orderHeader.Id, StaticDetails.StatusCancelled, StaticDetails.StatusCancelled);
+        //    }
+        //    _unitOfWork.Save();
 
-            TempData["success"] = "Order Cancelled Successfully";
-            return RedirectToAction(nameof(Details), new { orderId = OrderVM.OrderHeader.Id });
-        }
+        //    TempData["success"] = "Order Cancelled Successfully";
+        //    return RedirectToAction(nameof(Details), new { orderId = OrderVM.OrderHeader.Id });
+        //}
 
 
         [ActionName(nameof(Details))]
